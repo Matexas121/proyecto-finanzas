@@ -13,7 +13,7 @@
 
         <!-- Scripts -->
         @vite([
-        'resources/saas/app.scss', // Si importas Bootstrap vía SCSS
+        'resources/css/app.css', // Si importas Bootstrap vía SCSS
         'resources/js/app.js'      // Si importas Bootstrap vía JS
     ])
     </head>
