@@ -14,7 +14,7 @@ class Transferencia extends Model
     public $incrementing = true;
     public $timestamps= true;
     
-    protected $fillable = ["alias", "nombreDestinatario"];
+    protected $fillable = ["alias", "gasto_id", "nombreDestinarario", "idTransferencia"];
     
     public function gasto(){
         return $this->belongsTo(Gasto::class,'gasto_id','idGasto');

@@ -26,10 +26,18 @@ class TransferenciaController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     */
+     */ 
+    
+    
     public function store(Request $request)
     {
-        \App\Models\Transferencia::create($request->all());
+        \App\Models\Transferencia::create($request->all()); 
+        \App\Models\Transferencia::create([ 
+            "idTransferencia" => $request->input("idTransferencia"), 
+            "alias" => $request->input("alias"), 
+            "gastoid" => $request->input("gastoid"), 
+            "nombreDestinatario" => $request->input("nombreDestinatario"),  
+        ]);
         return redirect() -> route('transferencias.index');
     }
 

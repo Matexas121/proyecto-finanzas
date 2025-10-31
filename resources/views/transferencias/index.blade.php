@@ -1,8 +1,15 @@
+@extends("layout")
+
+@section("title", "Transferencias")
+
+@section("contenido")
 <html>
     <head>
         <title>Transferencias</title>
     </head>
-    <body>
+    <body> 
+        <div style="min-height: 100vh; background-color: white; padding: 50px 0; color: black;">
+        <div class="container">  
         <h1>Lista de transferencias</h1>
         <a href="{{route('transferencias.create')}}">Agregar transferencia</a>
         @if(count($transferencias)>0)
@@ -21,7 +28,9 @@
                         @csrf
                         @method('DELETE')
                         <button type='submit 'onclick="return confirm('Confirma que desea eliminar')">Eliminar</button>
-                    </form>
+                    </form> 
+
+                    
                 </td>
             </tr>
             
@@ -33,4 +42,7 @@
     </body>
     
 </html>
+@endsection
+    </div>
+</div>
 
