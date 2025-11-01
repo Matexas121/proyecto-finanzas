@@ -14,7 +14,7 @@
         <!-- Scripts -->
         @vite([
         'resources/css/app.css', // Si importas Bootstrap vía SCSS
-        'resources/js/app.js'      // Si importas Bootstrap vía JS
+        'resources/js/app.js'    // Si importas Bootstrap vía JS
     ])
     </head>
     <body class="font-sans antialiased">
@@ -22,17 +22,27 @@
             @include('layouts.navigation')
 
             <!-- Page Heading -->
-            @isset($header)
+            {{-- VERIFICAMOS SI $header EXISTE (USO COMO COMPONENTE) O BUSCAMOS @yield('header') (USO CON @extends) --}}
+            @if (isset($header) || View::hasSection('header'))
                 <header class="bg-white dark:bg-gray-800 shadow">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
+                        @isset($header)
+                            {{ $header }}
+                        @else
+                            @yield('header') {{-- Si no está definido el slot, busca el yield --}}
+                        @endisset
                     </div>
                 </header>
-            @endisset
+            @endif
 
             <!-- Page Content -->
             <main>
-                {{ $slot }}
+                {{-- VERIFICAMOS SI $slot EXISTE (USO COMO COMPONENTE) O BUSCAMOS @yield('content') (USO CON @extends) --}}
+                @if (isset($slot))
+                    {{ $slot }}
+                @else
+                    @yield('content') {{-- Si no está definido el slot, busca el yield --}}
+                @endif
             </main>
         </div>
     </body>
