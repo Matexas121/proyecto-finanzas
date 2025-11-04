@@ -7,11 +7,7 @@ use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\TransferenciaController;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-// ✅ Comprobación de PDF
-Route::get('/test-pdf', function () {
-    $pdf = Pdf::loadHTML('<h1>✅ DomPDF funciona correctamente</h1>');
-    return $pdf->download('test.pdf');
-});
+
 
 /*
 |--------------------------------------------------------------------------
