@@ -26,7 +26,7 @@ class ReporteController extends Controller
         $gastos = Gasto::where('idUsuario', $usuarioId)
             ->whereMonth('fecha', now()->month)
             ->whereYear('fecha', now()->year)
-            ->with('transferencia')
+            ->with('transferencia', 'categoria')
             ->get();
 
         $totalGastos = $gastos->sum('monto');

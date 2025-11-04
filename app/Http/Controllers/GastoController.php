@@ -213,7 +213,7 @@ public function filtrar(Request $request)
         if ($validated['formaPago'] === 'transferencia') {
             // Si es transferencia, se crea o actualiza el registro asociado.
             Transferencia::updateOrCreate(
-                ['idGasto' => $gasto->idGasto],
+                ['idGasto' => $gasto->gasto_id],
                 [
                     'alias' => $validated['alias'],
                     'nombreDestinatario' => $validated['nombreDestinatario'],
