@@ -28,7 +28,7 @@
                     <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">Añadí un nuevo gasto o transferencia.</p>
                     <a href="{{ route('gastos.create') }}" 
                        class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm">
-                        ➕ Nuevo Gasto
+                        Nuevo Gasto
                     </a>
                 </div>
 
@@ -38,7 +38,7 @@
                     <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">Consultá todos tus gastos registrados.</p>
                     <a href="{{ route('gastos.index') }}" 
                        class="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm">
-                        📋 Ver Gastos
+                        Ver Gastos
                     </a>
                 </div>
 
@@ -48,7 +48,7 @@
                     <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">Visualizá tus reportes y exportá tus datos.</p>
                     <a href="{{ route('reportes.index') }}" 
                        class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm">
-                        📊 Ver Reportes
+                        Ver Reportes
                     </a>
                 </div>
             </div>
