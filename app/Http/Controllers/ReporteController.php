@@ -2,34 +2,95 @@
 
 namespace App\Http\Controllers;
 
-use App\Service\ReporteFinancieroService; // ¡CORREGIDO! De App\Services a App\Service
-use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Gasto;
+use App\Models\Transferencia;
+use Illuminate\Support\Facades\Response;
+use Barryvdh\DomPDF\Facade\Pdf; // Asegurate de tener instalada la librería DomPDF
+use Illuminate\Support\Facades\Storage;
 
 class ReporteController extends Controller
 {
-    protected ReporteFinancieroService $reporteService;
-
-    /**
-     * Inyección de dependencia del servicio
-     */
-    public function __construct(ReporteFinancieroService $reporteService)
+    public function __construct()
     {
-        $this->reporteService = $reporteService;
+        $this->middleware('auth');
     }
 
     /**
-     * Muestra el resumen de reportes financieros.
+     * CU11 y CU12 - Resumen mensual y gráfico
      */
-    public function index(): View
+    public function index()
     {
-        // El servicio retorna un array con los datos calculados.
-        $reporte = $this->reporteService->generarReporte(auth()->id());
+        $usuarioId = Auth::id();
 
-        // Retorna la vista y le pasa el array de datos
-        return view('reportes.index', [
-            'reporte' => $reporte,
-        ]);
+        $gastos = Gasto::where('idUsuario', $usuarioId)
+            ->whereMonth('fecha', now()->month)
+            ->whereYear('fecha', now()->year)
+            ->with('transferencia')
+            ->get();
+
+        $totalGastos = $gastos->sum('monto');
+        $totalTransferencias = Transferencia::whereIn('idGasto', $gastos->pluck('idGasto'))->count();
+        $saldo = 100000 - $totalGastos;
+
+        $porCategoria = $gastos->groupBy('idCategoria')->map(fn($grupo) => $grupo->sum('monto'));
+
+        $labels = [];
+        $data = [];
+
+        foreach ($porCategoria as $categoria => $monto) {
+            $labels[] = $categoria ? "Categoría $categoria" : "Sin categoría";
+            $data[] = $monto;
+        }
+
+        return view('reportes.index', compact('totalGastos', 'totalTransferencias', 'saldo', 'labels', 'data', 'gastos'));
+    }
+
+    /**
+     * CU13 - Exportar a PDF o CSV
+     */
+    public function exportar($formato)
+    {
+        $usuarioId = Auth::id();
+        $gastos = Gasto::where('idUsuario', $usuarioId)->with('transferencia')->get();
+
+        if ($formato === 'csv') {
+            // Generar CSV
+            $csv = "Fecha,Monto,Forma de Pago,Descripción,Alias,Destinatario\n";
+            foreach ($gastos as $g) {
+                $csv .= "{$g->fecha},{$g->monto},{$g->formaPago},{$g->descripcion},";
+                $csv .= $g->transferencia ? "{$g->transferencia->alias},{$g->transferencia->nombreDestinatario}\n" : ",\n";
+            }
+            $filename = "reporte_gastos.csv";
+            return Response::make($csv, 200, [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => "attachment; filename=$filename",
+            ]);
+        }
+
+        if ($formato === 'pdf') {
+            $pdf = Pdf::loadView('reportes.pdf', compact('gastos'));
+            return $pdf->download('reporte_gastos.pdf');
+        }
+
+        return back()->with('error', 'Formato no válido.');
+    }
+
+    /**
+     * CU14 - Descargar copia de seguridad
+     */
+    public function backup()
+    {
+        $usuarioId = Auth::id();
+        $gastos = Gasto::where('idUsuario', $usuarioId)->with('transferencia')->get();
+
+        $json = json_encode($gastos, JSON_PRETTY_PRINT);
+        $filename = "backup_usuario_{$usuarioId}.json";
+
+        Storage::disk('local')->put($filename, $json);
+
+        return response()->download(storage_path("app/$filename"));
     }
 }
+
 

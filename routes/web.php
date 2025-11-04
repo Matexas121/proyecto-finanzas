@@ -1,40 +1,94 @@
-<<?php
+<?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\GastoController; 
-use App\Http\Controllers\ReporteController; 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\GastoController;
+use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\TransferenciaController;
+use Barryvdh\DomPDF\Facade\Pdf;
+
+Route::get('/test-pdf', function () {
+    $pdf = Pdf::loadHTML('<h1>✅ DomPDF funciona correctamente</h1>');
+    return $pdf->download('test.pdf');
+});
+
+
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+| Este archivo define todas las rutas web del sistema de control de finanzas.
+| Incluye autenticación, gestión de gastos y transferencias, reportes, 
+| exportaciones y copia de seguridad.
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD (solo usuarios verificados)
+|--------------------------------------------------------------------------
+*/
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard'); 
- 
-Route::resource("gastos", App\Http\Controllers\GastoController::class);    
-Route::resource("transferencias", App\Http\Controllers\TransferenciaController::class);  
+})->middleware(['auth', 'verified'])->name('dashboard');
 
+/*
+|--------------------------------------------------------------------------
+| RUTAS PROTEGIDAS - Accesibles solo con sesión iniciada
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth')->group(function () {
-    // Rutas de Perfil (Generadas por Breeze/Jetstream)
+
+    /*
+    |--------------------------------------------------------------------------
+    | PERFIL DE USUARIO
+    |--------------------------------------------------------------------------
+    | Generadas automáticamente por Breeze/Jetstream.
+    | Permiten editar, actualizar o eliminar la cuenta del usuario.
+    */
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    
-    // ----------------------------------------------------------------------------------
-    // CONSIGNAS DEL PROYECTO: GASTOS Y REPORTES
-    // ----------------------------------------------------------------------------------
 
-    // 1. CRUD de Gastos/Transferencias
-    // Esto genera 7 rutas automáticamente (index, create, store, show, edit, update, destroy)
+
+    /*
+    |--------------------------------------------------------------------------
+    | MÓDULO DE GASTOS Y TRANSFERENCIAS (CU5–CU9)
+    |--------------------------------------------------------------------------
+    | CRUD completo para gastos y transferencias, además de filtrado por fechas,
+    | forma de pago o categoría.
+    */
     Route::resource('gastos', GastoController::class);
+    Route::get('/gastos/filtrar', [GastoController::class, 'filtrar'])->name('gastos.filtrar');
 
-    // 2. Ruta de Reportes Financieros
-    // Accede a la lógica del ReporteController
+    Route::resource('transferencias', TransferenciaController::class);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | MÓDULO DE REPORTES Y ANÁLISIS (CU11–CU14)
+    |--------------------------------------------------------------------------
+    | Permite visualizar el resumen mensual, el gráfico de distribución de gastos,
+    | exportar datos a PDF/CSV y descargar copias de seguridad.
+    */
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+    Route::get('/reportes/exportar/{formato}', [ReporteController::class, 'exportar'])->name('reportes.exportar');
+    Route::get('/reportes/backup', [ReporteController::class, 'backup'])->name('reportes.backup');
 });
 
+/*
+|--------------------------------------------------------------------------
+| AUTENTICACIÓN (login, registro, recuperación de contraseña)
+|--------------------------------------------------------------------------
+*/
 require __DIR__.'/auth.php';
 
 
