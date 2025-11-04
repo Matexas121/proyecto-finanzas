@@ -25,7 +25,7 @@
 </head>
 
 <body> 
-    <h1>📝 Registrar nuevo gasto</h1>
+    <h1>Registrar nuevo gasto</h1>
 
     {{-- Botón para volver al listado --}}
     <a href="{{ route('gastos.index') }}">⬅️ Volver al listado</a>
@@ -99,7 +99,7 @@
 
         {{-- BOTÓN DE ENVÍO --}}
         <hr>
-        <button type="submit">💾 Guardar gasto</button>
+        <button type="submit">Guardar gasto</button>
     </form>
 
     {{-- Script para mostrar/ocultar los campos de transferencia --}}

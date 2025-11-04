@@ -5,12 +5,12 @@
 @section("contenido")
 <html>
     <body>
-        <h1>✏️ Editar Gasto</h1>
+        <h1>Editar Gasto</h1>
 
         {{-- PASO CRUCIAL: Mostrar Errores de Validación --}}
         @if ($errors->any())
             <div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 20px;">
-                <h3>⚠️ ¡No se pudo guardar el gasto!</h3>
+                <h3>No se pudo guardar el gasto</h3>
                 <ul>
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
