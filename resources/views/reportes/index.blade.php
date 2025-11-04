@@ -7,16 +7,35 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            background: #fafafa;
+            margin: 20px;
         }
         h1, h2 {
             color: #333;
         }
         .card {
-            background: #f9f9f9;
+            background: #fff;
             border: 1px solid #ccc;
             border-radius: 8px;
             padding: 15px;
             margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        /* 🔹 Contenedor del gráfico centrado y con tamaño fijo */
+        .chart-container {
+            width: 380px;
+            height: 380px;
+            margin: 0 auto; /* centra horizontalmente */
+            position: relative;
+        }
+
+        /* 🔹 Ajuste responsivo para pantallas pequeñas */
+        @media (max-width: 600px) {
+            .chart-container {
+                width: 300px;
+                height: 300px;
+            }
         }
     </style>
 </head>
@@ -37,7 +56,9 @@
     {{-- Gráfico de distribución (CU12) --}}
     <div class="card">
         <h2>📊 Distribución de gastos por categoría</h2>
-        <canvas id="graficoGastos" width="400" height="400"></canvas>
+        <div class="chart-container">
+            <canvas id="graficoGastos"></canvas>
+        </div>
     </div>
 
     <hr>
@@ -46,11 +67,10 @@
     <a href="{{ url('/reportes/exportar/csv') }}">📊 Exportar a CSV</a> |
     <a href="{{ url('/reportes/backup') }}">💾 Descargar copia de seguridad</a>
 
-
     <script>
         const ctx = document.getElementById('graficoGastos');
         const chart = new Chart(ctx, {
-            type: 'pie', // Podés cambiarlo a 'bar'
+            type: 'pie',
             data: {
                 labels: @json($labels),
                 datasets: [{
@@ -64,9 +84,14 @@
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false, // 🔹 esto hace que respete el tamaño del contenedor
                 plugins: {
                     legend: {
                         position: 'bottom',
+                        labels: {
+                            boxWidth: 20,
+                            color: '#333'
+                        }
                     }
                 }
             }
