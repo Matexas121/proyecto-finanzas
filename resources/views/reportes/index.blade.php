@@ -1,3 +1,8 @@
+@extends("layout")
+
+@section("title", "Transferencias")
+
+@section("contenido")
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -99,3 +104,6 @@
     </script>
 </body>
 </html>
+@endsection
+    </div>
+</div>

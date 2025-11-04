@@ -13,7 +13,7 @@
         <h1>Lista de transferencias</h1>
         <a href="{{route('transferencias.create')}}">Agregar transferencia</a>
         @if(count($transferencias)>0)
-        <table>
+        <table class = "table table-striped">
             <tr>
                 <th>Alias</th>
                 <th>Nombre de destinatario</th>
