@@ -16,7 +16,7 @@ class GastoController extends Controller
     }
 
     
-     * //CU8 - Visualización de lista de gastos del usuario autenticado.
+     //CU8 - Visualización de lista de gastos del usuario autenticado.
     public function index()
     {
         $usuarioId = Auth::id();
@@ -34,15 +34,7 @@ class GastoController extends Controller
         // 2. Mapea el grupo para sumar el 'monto' de los gastos en ese grupo
         ->map(fn($grupo) => $grupo->sum('monto'));
 
-<<<<<<< HEAD
     return view('gastos.index', compact('gastos', 'totalGeneral', 'subtotales', 'categorias'));
-=======
-        $categorias = Categoria::all();
-        $totalGeneral = $gastos->sum('monto'); //sum es una funcion propia de laravel, que en este caso sumara todos los valores que hay en monto en $gastos
-        $subtotales = $gastos->groupBy('idCategoria')->map(fn($grupo) => $grupo->sum('monto')); //groupby agrupa por idCateogoria - map() funciona como un foreach.  En su conjunto, esta funcion suma los montos por categoria
-
-        return view('gastos.index', compact('gastos', 'totalGeneral', 'subtotales', 'categorias'));
->>>>>>> 04403046df50dd7314dc66a179036adc293eb611
     }
 
     
