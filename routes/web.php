@@ -7,15 +7,11 @@ use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\TransferenciaController;
 use Barryvdh\DomPDF\Facade\Pdf;
 
+// ✅ Comprobación de PDF
 Route::get('/test-pdf', function () {
     $pdf = Pdf::loadHTML('<h1>✅ DomPDF funciona correctamente</h1>');
     return $pdf->download('test.pdf');
 });
-
-
-
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -51,8 +47,6 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     | PERFIL DE USUARIO
     |--------------------------------------------------------------------------
-    | Generadas automáticamente por Breeze/Jetstream.
-    | Permiten editar, actualizar o eliminar la cuenta del usuario.
     */
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -63,11 +57,10 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     | MÓDULO DE GASTOS Y TRANSFERENCIAS (CU5–CU9)
     |--------------------------------------------------------------------------
-    | CRUD completo para gastos y transferencias, además de filtrado por fechas,
-    | forma de pago o categoría.
+    | ✅ Importante: la ruta de filtro debe ir antes del resource
     */
-    Route::resource('gastos', GastoController::class);
     Route::get('/gastos/filtrar', [GastoController::class, 'filtrar'])->name('gastos.filtrar');
+    Route::resource('gastos', GastoController::class);
 
     Route::resource('transferencias', TransferenciaController::class);
 
@@ -76,8 +69,6 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     | MÓDULO DE REPORTES Y ANÁLISIS (CU11–CU14)
     |--------------------------------------------------------------------------
-    | Permite visualizar el resumen mensual, el gráfico de distribución de gastos,
-    | exportar datos a PDF/CSV y descargar copias de seguridad.
     */
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
     Route::get('/reportes/exportar/{formato}', [ReporteController::class, 'exportar'])->name('reportes.exportar');
@@ -89,6 +80,4 @@ Route::middleware('auth')->group(function () {
 | AUTENTICACIÓN (login, registro, recuperación de contraseña)
 |--------------------------------------------------------------------------
 */
-require __DIR__.'/auth.php';
-
-
+require __DIR__ . '/auth.php';
