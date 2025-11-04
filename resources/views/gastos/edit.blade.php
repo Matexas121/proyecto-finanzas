@@ -9,8 +9,8 @@
 
         {{-- PASO CRUCIAL: Mostrar Errores de Validación --}}
         @if ($errors->any())
-            <div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 20px;">
-                <h3>No se pudo guardar el gasto</h3>
+            <div style="color: white; background-color: #dc3545; border: 1px solid #dc3545; padding: 10px; margin-bottom: 20px; border-radius: 5px;">
+                <h3>❌ Error: No se pudo guardar el gasto</h3>
                 <ul>
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -23,78 +23,93 @@
             @csrf
             @method("put")
             
-            <label>Monto</label>
-            <input name='monto' type='number' step="0.01" 
-                   value='{{ old('monto', $gasto->monto) }}'>
-            @error('monto') <span style="color: red;">{{ $message }}</span> @enderror
-            
-            <br>
-            
-            <label>Fecha</label>
-            <input name='fecha' type='date' 
-                   value='{{ old('fecha', $gasto->fecha) }}'>
-            @error('fecha') <span style="color: red;">{{ $message }}</span> @enderror
-            
-            <br>
-
-            <label>Descripción</label>
-            <input name='descripcion' type='text' 
-                   value='{{ old('descripcion', $gasto->descripcion) }}'>
-            @error('descripcion') <span style="color: red;">{{ $message }}</span> @enderror
-            
-            <br>
-
-            <label>Forma de Pago</label>
-            {{-- AÑADIDO ID PARA JAVASCRIPT --}}
-            <select name="formaPago" id="formaPagoSelect"> 
-                <option value="efectivo" {{ old('formaPago', $gasto->formaPago) == 'efectivo' ? 'selected' : '' }}>Efectivo</option>
-                <option value="tarjeta" {{ old('formaPago', $gasto->formaPago) == 'tarjeta' ? 'selected' : '' }}>Tarjeta</option>
-                <option value="transferencia" {{ old('formaPago', $gasto->formaPago) == 'transferencia' ? 'selected' : '' }}>Transferencia</option>
-            </select>
-            @error('formaPago') <span style="color: red;">{{ $message }}</span> @enderror
-            
-            <br>
-
-            
-        <label>Categoría</label>
-        <select name="idCategoria">
-            {{-- Opción para "Sin Categoría" (si idCategoria es nullable) --}}
-                <option value="">-- Seleccione una categoría --</option> 
-
-                {{-- Iterar sobre la colección de categorías --}}
-                 @foreach ($categorias as $categoria)
-                  {{-- Clave para la persistencia de Old() y la selección actual --}}
-                 @php
-                 // Determinar si esta categoría debe estar 'selected'
-                 $isSelected = (string)old('idCategoria', $gasto->idCategoria) === (string)$categoria->idCategoria;
-                    @endphp
-                    <option value="{{ $categoria->idCategoria }}" {{ $isSelected ? 'selected' : '' }}>
-                {{ $categoria->nombre }}
-                </option>
-            @endforeach
-            </select>
-        @error('idCategoria') <span style="color: red;">{{ $message }}</span> @enderror
-
-            
-            {{-- CONTENEDOR DE CAMPOS DE TRANSFERENCIA --}}
-            {{-- Nota: Usamos 'old' para persistir datos después de fallos de validación --}}
-            <div id="camposTransferencia" style="margin-top: 15px;">
-                <label>Alias (Transferencia)</label>
-                <input name='alias' type='text' 
-                       value='{{ old('alias', $gasto->transferencia->alias ?? '') }}'>
-                @error('alias') <span style="color: red;">{{ $message }}</span> @enderror
+            {{-- INICIO DE LA TABLA/GRID DEL FORMULARIO --}}
+            <div style="display: grid; grid-template-columns: 150px 1fr; gap: 15px; max-width: 600px;">
                 
-                <br>
+                {{-- CAMPO: MONTO --}}
+                <label style="align-self: center; font-weight: bold;">Monto ($)</label>
+                <div>
+                    <input name='monto' type='number' step="0.01" style="width: 100%; padding: 8px; box-sizing: border-box;"
+                           value='{{ old('monto', $gasto->monto) }}'>
+                    @error('monto') <span style="color: red; display: block; margin-top: 5px;">{{ $message }}</span> @enderror
+                </div>
+                
+                {{-- CAMPO: FECHA --}}
+                <label style="align-self: center; font-weight: bold;">Fecha</label>
+                <div>
+                    <input name='fecha' type='date' style="width: 100%; padding: 8px; box-sizing: border-box;"
+                           value='{{ old('fecha', $gasto->fecha) }}'>
+                    @error('fecha') <span style="color: red; display: block; margin-top: 5px;">{{ $message }}</span> @enderror
+                </div>
+                
+                {{-- CAMPO: DESCRIPCIÓN --}}
+                <label style="align-self: center; font-weight: bold;">Descripción</label>
+                <div>
+                    <input name='descripcion' type='text' style="width: 100%; padding: 8px; box-sizing: border-box;"
+                           value='{{ old('descripcion', $gasto->descripcion) }}'>
+                    @error('descripcion') <span style="color: red; display: block; margin-top: 5px;">{{ $message }}</span> @enderror
+                </div>
+                
+                {{-- CAMPO: FORMA DE PAGO --}}
+                <label style="align-self: center; font-weight: bold;">Forma de Pago</label>
+                <div>
+                    <select name="formaPago" id="formaPagoSelect" style="width: 100%; padding: 8px; box-sizing: border-box;"> 
+                        <option value="efectivo" {{ old('formaPago', $gasto->formaPago) == 'efectivo' ? 'selected' : '' }}>Efectivo</option>
+                        <option value="tarjeta" {{ old('formaPago', $gasto->formaPago) == 'tarjeta' ? 'selected' : '' }}>Tarjeta</option>
+                        <option value="transferencia" {{ old('formaPago', $gasto->formaPago) == 'transferencia' ? 'selected' : '' }}>Transferencia</option>
+                    </select>
+                    @error('formaPago') <span style="color: red; display: block; margin-top: 5px;">{{ $message }}</span> @enderror
+                </div>
+                
+                {{-- CAMPO: CATEGORÍA --}}
+                <label style="align-self: center; font-weight: bold;">Categoría</label>
+                <div>
+                    <select name="idCategoria" style="width: 100%; padding: 8px; box-sizing: border-box;">
+                        <option value="">-- Seleccione una categoría --</option> 
+                        @foreach ($categorias as $categoria)
+                            @php
+                            $isSelected = (string)old('idCategoria', $gasto->idCategoria) === (string)$categoria->idCategoria;
+                            @endphp
+                            <option value="{{ $categoria->idCategoria }}" {{ $isSelected ? 'selected' : '' }}>
+                                {{ $categoria->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('idCategoria') <span style="color: red; display: block; margin-top: 5px;">{{ $message }}</span> @enderror
+                </div>
 
-                <label>Nombre Destinatario</label>
-                <input name='nombreDestinatario' type='text' 
-                       value='{{ old('nombreDestinatario', $gasto->transferencia->nombreDestinatario ?? '') }}'>
-                @error('nombreDestinatario') <span style="color: red;">{{ $message }}</span> @enderror
+            </div> {{-- FIN DEL GRID PRINCIPAL --}}
+            
+            <hr style="margin: 25px 0; border-top: 1px solid #ccc; max-width: 600px;">
+
+            {{-- CONTENEDOR DE CAMPOS DE TRANSFERENCIA (Fuera del Grid principal) --}}
+            <div id="camposTransferencia" style="max-width: 600px;">
+                <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 15px;">Datos de Transferencia</h3>
+                
+                <div style="display: grid; grid-template-columns: 150px 1fr; gap: 15px;">
+                    {{-- CAMPO: ALIAS --}}
+                    <label style="align-self: center;">Alias (CBU)</label>
+                    <div>
+                        <input name='alias' type='text' style="width: 100%; padding: 8px; box-sizing: border-box;"
+                                value='{{ old('alias', $gasto->transferencia->alias ?? '') }}'>
+                        @error('alias') <span style="color: red; display: block; margin-top: 5px;">{{ $message }}</span> @enderror
+                    </div>
+
+                    {{-- CAMPO: NOMBRE DESTINATARIO --}}
+                    <label style="align-self: center;">Nombre Destinatario</label>
+                    <div>
+                        <input name='nombreDestinatario' type='text' style="width: 100%; padding: 8px; box-sizing: border-box;"
+                                value='{{ old('nombreDestinatario', $gasto->transferencia->nombreDestinatario ?? '') }}'>
+                        @error('nombreDestinatario') <span style="color: red; display: block; margin-top: 5px;">{{ $message }}</span> @enderror
+                    </div>
+                </div>
             </div>
 
-
-            <br><br>
-            <button type='submit'>Guardar Cambios</button> 
+            <div style="margin-top: 25px; max-width: 600px; text-align: right;">
+                <button type='submit' style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                     Guardar Cambios
+                </button> 
+            </div>
         </form>
     </body>
 </html> 
@@ -107,15 +122,15 @@
 
         // Función para mostrar u ocultar los campos
         function toggleTransferenciaFields() {
+            // Utilizamos 'block' para mantener el diseño de grid dentro del div
             if (selectElement.value === 'transferencia') {
-                transferenciaDiv.style.display = 'block'; // Muestra el div
+                transferenciaDiv.style.display = 'block'; 
             } else {
-                transferenciaDiv.style.display = 'none'; // Oculta el div
+                transferenciaDiv.style.display = 'none'; 
             }
         }
 
-        // 1. Ejecutar la función inmediatamente al cargar la página
-        // Esto es crucial para que los campos estén visibles si el gasto YA es una transferencia.
+        // 1. Ejecutar la función inmediatamente al cargar la página (para persistir el estado)
         toggleTransferenciaFields();
 
         // 2. Ejecutar la función cada vez que se cambia el valor del select

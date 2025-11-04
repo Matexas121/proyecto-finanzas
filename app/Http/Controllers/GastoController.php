@@ -25,12 +25,24 @@ class GastoController extends Controller
             ->with('transferencia', 'categoria')  //accede a las relaciones gracias a las funciones del modelo
             ->orderBy('fecha', 'desc') //ordena por fecha de manera descendente 
             ->get();
+    $categorias = Categoria::all(); // Esta línea está bien si la usas para otras cosas.
+    $totalGeneral = $gastos->sum('monto');
+       // 💡 CAMBIO CLAVE: Agrupar por el nombre de la categoría y mapear para sumar
+    $subtotales = $gastos
+        // 1. Agrupa la colección por el nombre del modelo relacionado 'categoria'
+        ->groupBy(fn($gasto) => $gasto->categoria->nombre ?? 'Sin Categoría')
+        // 2. Mapea el grupo para sumar el 'monto' de los gastos en ese grupo
+        ->map(fn($grupo) => $grupo->sum('monto'));
 
+<<<<<<< HEAD
+    return view('gastos.index', compact('gastos', 'totalGeneral', 'subtotales', 'categorias'));
+=======
         $categorias = Categoria::all();
         $totalGeneral = $gastos->sum('monto'); //sum es una funcion propia de laravel, que en este caso sumara todos los valores que hay en monto en $gastos
         $subtotales = $gastos->groupBy('idCategoria')->map(fn($grupo) => $grupo->sum('monto')); //groupby agrupa por idCateogoria - map() funciona como un foreach.  En su conjunto, esta funcion suma los montos por categoria
 
         return view('gastos.index', compact('gastos', 'totalGeneral', 'subtotales', 'categorias'));
+>>>>>>> 04403046df50dd7314dc66a179036adc293eb611
     }
 
     
