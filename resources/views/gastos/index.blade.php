@@ -1,6 +1,6 @@
 @extends("layout")
 
-@section("title", "Transferencias")
+@section("title", "Gastos")
 
 @section("contenido")
 <!DOCTYPE html>
@@ -42,22 +42,34 @@
             margin-right: 10px;
             padding: 5px;
         }
+        a.btn {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+        a.btn:hover {
+            background: #0b7dda;
+        }
     </style>
 </head>
 
 <body>
     <h1>💰 Listado de Gastos</h1>
 
-    {{-- Mensaje de éxito luego de crear/editar/eliminar --}}
+    {{-- Mensaje de éxito --}}
     @if (session('success'))
         <p class="success">{{ session('success') }}</p>
     @endif
 
-    {{-- Botón para crear un nuevo gasto --}}
+    {{-- Botón para crear nuevo gasto --}}
     <a href="{{ route('gastos.create') }}">➕ Agregar gasto</a>
     <hr>
 
-    {{-- FORMULARIO DE FILTRO (CU9) --}}
+    {{-- Filtro (CU9) --}}
     <div class="filter-box">
         <h3>🔍 Filtrar gastos</h3>
         <form method="GET" action="{{ route('gastos.filtrar') }}">
@@ -80,7 +92,7 @@
         </form>
     </div>
 
-    {{-- TABLA DE GASTOS (CU8) --}}
+    {{-- Tabla de gastos --}}
     @if(count($gastos) > 0)
         <table>
             <thead>
@@ -89,10 +101,9 @@
                     <th>Monto</th>
                     <th>Forma de Pago</th>
                     <th>Descripción</th> 
-                    <th>Categorias</th>
+                    <th>Categoría</th>
                     <th>Transferencia</th> 
                     <th>Acciones</th> 
-                    
                 </tr>
             </thead>
             <tbody>
@@ -102,10 +113,8 @@
                         <td>${{ number_format($gasto->monto, 2, ',', '.') }}</td>
                         <td>{{ ucfirst($gasto->formaPago) }}</td>
                         <td>{{ $gasto->descripcion ?? '—' }}</td> 
-                        <td>{{$gasto->categoria->nombre ?? '-'}} </td> 
-                        
+                        <td>{{ $gasto->categoria->nombre ?? '-' }}</td> 
 
-                        {{-- Mostrar datos de transferencia si corresponde --}}
                         <td>
                             @if($gasto->transferencia)
                                 <strong>Alias:</strong> {{ $gasto->transferencia->alias }} <br>
@@ -115,14 +124,18 @@
                             @endif
                         </td>
 
-                        {{-- Botones CRUD (CU6, CU7) --}}
                         <td>
-                            <a href="{{ route('gastos.edit', $gasto->idGasto) }}">✏️ Editar</a>
+                            {{-- Nuevo botón Ver detalle --}}
+                            <a class="btn" href="{{ route('gastos.show', $gasto->idGasto) }}">👁️ Ver</a>
 
+                            {{-- Editar --}}
+                            <a class="btn" href="{{ route('gastos.edit', $gasto->idGasto) }}">✏️ Editar</a>
+
+                            {{-- Eliminar --}}
                             <form method="POST" action="{{ route('gastos.destroy', $gasto->idGasto) }}" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" onclick="return confirm('¿Deseas eliminar este gasto?')">🗑️ Eliminar</button>
+                                <button type="submit" onclick="return confirm('¿Deseas eliminar este gasto?')">🗑️</button>
                             </form>
                         </td>
                     </tr>
@@ -130,11 +143,9 @@
             </tbody>
         </table>
 
-        {{-- Totales (CU10) --}}
         <hr>
         <h3>💵 Total general: ${{ number_format($gastos->sum('monto'), 2, ',', '.') }}</h3>
 
-        {{-- Subtotales por categoría (CU10) --}}
         @if(isset($subtotales) && count($subtotales) > 0)
             <h3>📊 Subtotales por categoría:</h3>
             <ul>
@@ -149,5 +160,3 @@
 </body>
 </html>
 @endsection
-    </div>
-</div>
