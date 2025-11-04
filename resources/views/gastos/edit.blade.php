@@ -8,7 +8,7 @@
         <h1> Editar gastos</h1>
         <form method='post' action='{{route('gastos.update', $gasto->idGasto)}}'>
             @csrf
-            @method('PUT')
+            @method("put")
             
             <label>Monto</label>
             <input name='monto' type='number' value='{{old('monto', $gasto->monto)}}'>

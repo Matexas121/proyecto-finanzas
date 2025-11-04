@@ -27,11 +27,21 @@ class ReporteController extends Controller
         $gastos = Gasto::where('idUsuario', $usuarioId)
             ->whereMonth('fecha', now()->month)
             ->whereYear('fecha', now()->year)
-            ->with('transferencia')
+            ->with('transferencia', 'categoria')
             ->get();
 
         // Total de gastos del mes
         $totalGastos = $gastos->sum('monto');
+
+
+
+        // Total de transferencias registradas (corrige la columna a gasto_id)
+        $totalTransferencias = Transferencia::whereIn('gasto_id', $gastos->pluck('idGasto'))->count();
+
+        // Saldo simulado (en este ejemplo fijo en 100000)
+
+        $saldo = 100000 - $totalGastos;
+
 
         // Agrupar por categoría y calcular subtotales
         $porCategoria = $gastos->groupBy('idCategoria')->map(fn($grupo) => $grupo->sum('monto'));
