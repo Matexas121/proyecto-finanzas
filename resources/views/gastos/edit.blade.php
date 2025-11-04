@@ -14,7 +14,10 @@
             <input name='monto' type='number' value='{{old('monto', $gasto->monto)}}'>
             
             <label>Forma de pago</label>
-            <input name='formaPago' type='text' value='{{old('formaPago', $gasto->formaPago)}}'>
+            <input name='formaPago' type='text' value='{{old('formaPago', $gasto->formaPago)}}'> 
+
+            <label>Descripcion</label>
+            <input name='descripcion' type='text' value='{{old('descripcion', $gasto->descripcion)}}'>
             
             <button type='submit'>Guardar</button>
         </form>

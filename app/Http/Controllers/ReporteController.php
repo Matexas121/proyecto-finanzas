@@ -30,7 +30,7 @@ class ReporteController extends Controller
             ->get();
 
         $totalGastos = $gastos->sum('monto');
-        $totalTransferencias = Transferencia::whereIn('idGasto', $gastos->pluck('idGasto'))->count();
+        $totalTransferencias = Transferencia::whereIn('gasto_id', $gastos->pluck('idGasto'))->count();
         $saldo = 100000 - $totalGastos;
 
         $porCategoria = $gastos->groupBy('idCategoria')->map(fn($grupo) => $grupo->sum('monto'));

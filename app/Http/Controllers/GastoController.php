@@ -25,7 +25,7 @@ class GastoController extends Controller
         // Filtramos los gastos para que solo se muestren los del usuario autenticado.
         // Se usa "with('transferencia')" para traer los datos de la relación si existen.
         $gastos = Gasto::where('idUsuario', Auth::id())
-                        ->with('transferencia')
+                        ->with('transferencia', 'categoria')
                         ->orderBy('fecha', 'desc')
                         ->get();
 
@@ -53,7 +53,8 @@ public function filtrar(Request $request)
 
     // Filtrado por categoría (opcional)
     if ($request->filled('idCategoria')) {
-        $query->where('idCategoria', $request->idCategoria);
+        $query->where('idCategoria', $request->idCategoria); 
+        
     }
 
     // Obtener resultados

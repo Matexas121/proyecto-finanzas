@@ -88,9 +88,11 @@
                     <th>Fecha</th>
                     <th>Monto</th>
                     <th>Forma de Pago</th>
-                    <th>Descripción</th>
-                    <th>Transferencia</th>
-                    <th>Acciones</th>
+                    <th>Descripción</th> 
+                    <th>Categorias</th>
+                    <th>Transferencia</th> 
+                    <th>Acciones</th> 
+                    
                 </tr>
             </thead>
             <tbody>
@@ -99,7 +101,9 @@
                         <td>{{ \Carbon\Carbon::parse($gasto->fecha)->format('d/m/Y') }}</td>
                         <td>${{ number_format($gasto->monto, 2, ',', '.') }}</td>
                         <td>{{ ucfirst($gasto->formaPago) }}</td>
-                        <td>{{ $gasto->descripcion ?? '—' }}</td>
+                        <td>{{ $gasto->descripcion ?? '—' }}</td> 
+                        <td>{{$gasto->categoria->nombre ?? '-'}} </td> 
+                        
 
                         {{-- Mostrar datos de transferencia si corresponde --}}
                         <td>
