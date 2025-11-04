@@ -26,15 +26,11 @@ class GastoController extends Controller
             ->orderBy('fecha', 'desc') //ordena por fecha de manera descendente 
             ->get();
 
-<<<<<<< HEAD
-    return view('gastos.index', compact('gastos', 'totalGeneral', 'subtotales', 'categorias'));
-=======
-        $categorias = Categoria::all();
+        $categorias = Categoria::all(); 
         $totalGeneral = $gastos->sum('monto'); //sum es una funcion propia de laravel, que en este caso sumara todos los valores que hay en monto en $gastos
-        $subtotales = $gastos->groupBy('idCategoria')->map(fn($grupo) => $grupo->sum('monto')); //groupby agrupa por idCateogoria - map() funciona como un foreach.  En su conjunto, esta funcion suma los montos por categoria
-
+        $subtotales = $gastos->groupBy(fn($gasto) => $gasto->categoria->nombre ?? 'Sin Categoría') //groupby agrupa por idCateogoria - map() funciona como un foreach.  En su conjunto, esta funcion suma los montos por categoria
+        ->map(fn($grupo) => $grupo->sum('monto'));
         return view('gastos.index', compact('gastos', 'totalGeneral', 'subtotales', 'categorias'));
->>>>>>> 50a285c48a77ec824b6843e07e7164e8ab4182ab
     }
 
     
