@@ -185,7 +185,7 @@ public function filtrar(Request $request)
             'fecha' => 'required|date',
             'formaPago' => 'required|string|in:efectivo,tarjeta,transferencia',
             'descripcion' => 'nullable|string|max:255',
-            'idCategoria' => 'nullable|integer',
+            'idCategoria' => 'nullable|integer', 
         ];
 
         // Validaciones adicionales si es transferencia.
@@ -204,7 +204,7 @@ public function filtrar(Request $request)
             'fecha' => $validated['fecha'],
             'descripcion' => $validated['descripcion'] ?? null,
             'formaPago' => $validated['formaPago'], 
-            'dniUsuario' => $validated['dniUsuario'],
+            'dniUsuario' => $gasto->dniUsuario,
             'idCategoria' => $validated['idCategoria'] ?? null,
         ]);
 
@@ -214,7 +214,7 @@ public function filtrar(Request $request)
         if ($validated['formaPago'] === 'transferencia') {
             // Si es transferencia, se crea o actualiza el registro asociado.
             Transferencia::updateOrCreate(
-                ['idGasto' => $gasto->gasto_id],
+                ['gasto_id' => $gasto->idGasto],
                 [
                     'alias' => $validated['alias'],
                     'nombreDestinatario' => $validated['nombreDestinatario'],
