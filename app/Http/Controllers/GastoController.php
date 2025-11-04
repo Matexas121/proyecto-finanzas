@@ -203,7 +203,8 @@ public function filtrar(Request $request)
             'monto' => $validated['monto'],
             'fecha' => $validated['fecha'],
             'descripcion' => $validated['descripcion'] ?? null,
-            'formaPago' => $validated['formaPago'],
+            'formaPago' => $validated['formaPago'], 
+            'dniUsuario' => $validated['dniUsuario'],
             'idCategoria' => $validated['idCategoria'] ?? null,
         ]);
 

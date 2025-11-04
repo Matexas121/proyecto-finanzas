@@ -32,15 +32,12 @@ class ReporteController extends Controller
 
         // Total de gastos del mes
         $totalGastos = $gastos->sum('monto');
-<<<<<<< HEAD
-        $totalTransferencias = Transferencia::whereIn('gasto_id', $gastos->pluck('idGasto'))->count();
-=======
-
+         
         // Total de transferencias registradas (corrige la columna a gasto_id)
         $totalTransferencias = Transferencia::whereIn('gasto_id', $gastos->pluck('idGasto'))->count();
 
         // Saldo simulado (en este ejemplo fijo en 100000)
->>>>>>> 1d697772ca9df3e021b054a2708a9c32075a7c38
+
         $saldo = 100000 - $totalGastos;
 
         // Agrupar por categoría y calcular subtotales
