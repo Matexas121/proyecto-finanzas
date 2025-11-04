@@ -26,12 +26,16 @@ class GastoController extends Controller
             ->with('transferencia', 'categoria')
             ->orderBy('fecha', 'desc')
             ->get();
+    $categorias = Categoria::all(); // Esta línea está bien si la usas para otras cosas.
+    $totalGeneral = $gastos->sum('monto');
+       // 💡 CAMBIO CLAVE: Agrupar por el nombre de la categoría y mapear para sumar
+    $subtotales = $gastos
+        // 1. Agrupa la colección por el nombre del modelo relacionado 'categoria'
+        ->groupBy(fn($gasto) => $gasto->categoria->nombre ?? 'Sin Categoría')
+        // 2. Mapea el grupo para sumar el 'monto' de los gastos en ese grupo
+        ->map(fn($grupo) => $grupo->sum('monto'));
 
-        $categorias = Categoria::all();
-        $totalGeneral = $gastos->sum('monto');
-        $subtotales = $gastos->groupBy('idCategoria')->map(fn($grupo) => $grupo->sum('monto'));
-
-        return view('gastos.index', compact('gastos', 'totalGeneral', 'subtotales', 'categorias'));
+    return view('gastos.index', compact('gastos', 'totalGeneral', 'subtotales', 'categorias'));
     }
 
     /**
