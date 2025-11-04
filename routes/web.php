@@ -21,7 +21,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
 
 /*
 |--------------------------------------------------------------------------
