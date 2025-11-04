@@ -24,15 +24,15 @@ class ReporteController extends Controller
     {
         $usuarioId = Auth::id();
 
-        // 🔹 Mes/Año principal (actual o seleccionado)
+        // Mes/Año principal (actual o seleccionado)
         $mesSeleccionado = request('mes') ?? now()->month;
         $anioSeleccionado = request('anio') ?? now()->year;
 
-        // 🔹 Mes/Año de comparación (opcional)
+        // Mes/Año de comparación (opcional)
         $mesComparar = request('mes_comparar');
         $anioComparar = request('anio_comparar');
 
-        // 🔹 Gastos del mes principal
+        // Gastos del mes principal
         $gastos = Gasto::where('idUsuario', $usuarioId)
             ->whereMonth('fecha', $mesSeleccionado)
             ->whereYear('fecha', $anioSeleccionado)
@@ -42,7 +42,7 @@ class ReporteController extends Controller
         $totalGastos = $gastos->sum('monto');
         $totalTransferencias = Transferencia::whereIn('gasto_id', $gastos->pluck('idGasto'))->count();
 
-        // 🔹 Comparación con otro mes (si fue seleccionado)
+        // Comparación con otro mes (si fue seleccionado)
         $totalMesComparado = null;
         $variacion = null;
 
@@ -59,7 +59,7 @@ class ReporteController extends Controller
             }
         }
 
-        // 🔹 Gráfico por categoría
+        // Gráfico por categoría
         $porCategoria = $gastos->groupBy('idCategoria')->map(fn($grupo) => $grupo->sum('monto'));
 
         $labels = [];
@@ -119,18 +119,18 @@ class ReporteController extends Controller
     }
 
     /**
-     * ✅ CU14 - Descargar copia de seguridad (versión corregida)
+     * CU14 - Descargar copia de seguridad (versión corregida)
      */
     public function backup()
     {
         $usuarioId = Auth::id();
 
-        // 🔹 Trae los gastos del usuario
+        //Trae los gastos del usuario
         $gastos = Gasto::where('idUsuario', $usuarioId)
             ->with('transferencia', 'categoria')
             ->get();
 
-        // 🔹 Convierte los datos a JSON
+        // Convierte los datos a JSON
         $json = json_encode($gastos, JSON_PRETTY_PRINT);
         $filename = "backup_usuario_{$usuarioId}.json";
         $path = storage_path('app/' . $filename);
