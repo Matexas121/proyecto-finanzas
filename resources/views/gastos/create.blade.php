@@ -83,14 +83,19 @@
             @enderror
         </div>
 
-        {{-- CATEGORÍA (opcional, si ya tenés la tabla creada) --}}
-        {{-- <label for="idCategoria">Categoría:</label>
-        <select name="idCategoria" id="idCategoria">
+        {{-- CATEGORÍA --}}
+        <label for="idCategoria">Categoría:</label>
+        <select name="idCategoria" id="idCategoria" required>
             <option value="">-- Seleccionar categoría --</option>
-            <option value="1">Alimentación</option>
-            <option value="2">Transporte</option>
-            <option value="3">Ocio</option>
-        </select> --}}
+            @foreach(\App\Models\Categoria::all() as $categoria)
+                <option value="{{ $categoria->idCategoria }}" {{ old('idCategoria') == $categoria->idCategoria ? 'selected' : '' }}>
+                    {{ $categoria->nombre }}
+                </option>
+            @endforeach
+        </select>
+        @error('idCategoria')
+            <p class="error">{{ $message }}</p>
+        @enderror
 
         {{-- BOTÓN DE ENVÍO --}}
         <hr>
@@ -103,22 +108,13 @@
         const transferenciaFields = document.getElementById('transferencia_fields');
 
         function toggleTransferenciaFields() {
-            if (formaPagoSelect.value === 'transferencia') {
-                transferenciaFields.style.display = 'block';
-            } else {
-                transferenciaFields.style.display = 'none';
-            }
+            transferenciaFields.style.display = formaPagoSelect.value === 'transferencia' ? 'block' : 'none';
         }
 
-        // Ejecutar al cambiar la selección
         formaPagoSelect.addEventListener('change', toggleTransferenciaFields);
-
-        // Ejecutar al cargar la página (por si hay un old('formaPago') = transferencia)
         window.addEventListener('load', toggleTransferenciaFields);
     </script>
 
 </body>
 </html>
 @endsection
-    </div>
-</div>
