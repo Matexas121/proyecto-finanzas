@@ -1,3 +1,8 @@
+@extends("layout")
+
+@section("title", "Transferencias")
+
+@section("contenido")
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -19,7 +24,7 @@
     </style>
 </head>
 
-<body>
+<body> 
     <h1>📝 Registrar nuevo gasto</h1>
 
     {{-- Botón para volver al listado --}}
@@ -114,4 +119,6 @@
 
 </body>
 </html>
-
+@endsection
+    </div>
+</div>

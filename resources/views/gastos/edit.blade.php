@@ -1,3 +1,8 @@
+@extends("layout")
+
+@section("title", "Transferencias")
+
+@section("contenido")
 <html>
     <body>
         <h1> Editar gastos</h1>
@@ -14,4 +19,7 @@
             <button type='submit'>Guardar</button>
         </form>
     </body>
-</html>
+</html> 
+@endsection
+    </div>
+</div>

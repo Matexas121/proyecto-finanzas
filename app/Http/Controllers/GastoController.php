@@ -113,7 +113,8 @@ public function filtrar(Request $request)
             'fecha' => $validated['fecha'],
             'descripcion' => $validated['descripcion'] ?? null,
             'formaPago' => $validated['formaPago'],
-            'idUsuario' => Auth::id(), // Vinculamos el gasto al usuario logueado.
+            'dniUsuario' => Auth::user()->dniUsuario, // Usar el campo DNI del usuario autenticado
+            'idUsuario' => Auth::id(), // Si la tabla NECESITA AMBOS, envíale ambos
             'idCategoria' => $validated['idCategoria'] ?? null,
         ]);
 
@@ -125,7 +126,7 @@ public function filtrar(Request $request)
             Transferencia::create([
                 'alias' => $validated['alias'],
                 'nombreDestinatario' => $validated['nombreDestinatario'],
-                'idGasto' => $gasto->idGasto, // Clave primaria correcta del modelo
+                'gasto_id' => $gasto->idGasto, // Clave primaria correcta del modelo
             ]);
         }
 
