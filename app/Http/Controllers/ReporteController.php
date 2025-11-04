@@ -33,10 +33,6 @@ class ReporteController extends Controller
         // Total de gastos del mes
         $totalGastos = $gastos->sum('monto');
 
-        $totalTransferencias = Transferencia::whereIn('gasto_id', $gastos->pluck('idGasto'))->count();
-
-        $saldo = 100000 - $totalGastos;
-
         // Agrupar por categoría y calcular subtotales
         $porCategoria = $gastos->groupBy('idCategoria')->map(fn($grupo) => $grupo->sum('monto'));
 
