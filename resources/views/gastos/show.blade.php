@@ -51,7 +51,7 @@
 
 <body>
     <div class="container">
-        <h1>🧾 Detalle del Gasto #{{ $gasto->idGasto }}</h1>
+        <h1>Detalle del Gasto #{{ $gasto->idGasto }}</h1>
 
         <table>
             <tr>
@@ -86,7 +86,7 @@
             @endif
         </table>
 
-        <a href="{{ route('gastos.index') }}">⬅️ Volver al listado</a>
+        <a href="{{ route('gastos.index') }}">Volver al listado</a>
     </div>
 </body>
 </html>
