@@ -28,7 +28,7 @@ class ReporteController extends Controller
         $mesSeleccionado = request('mes') ?? now()->month;
         $anioSeleccionado = request('anio') ?? now()->year;
 
-        // 🔹 Mes/Año de comparación (opcional, elegidos por el usuario)
+        // 🔹 Mes/Año de comparación (opcional)
         $mesComparar = request('mes_comparar');
         $anioComparar = request('anio_comparar');
 
@@ -54,13 +54,12 @@ class ReporteController extends Controller
 
             $totalMesComparado = $gastosComparar->sum('monto');
 
-            // Si hay datos del mes comparado, calculamos la variación
             if ($totalMesComparado > 0) {
                 $variacion = (($totalGastos - $totalMesComparado) / $totalMesComparado) * 100;
             }
         }
 
-        // 🔹 Gráfico de distribución por categoría
+        // 🔹 Gráfico por categoría
         $porCategoria = $gastos->groupBy('idCategoria')->map(fn($grupo) => $grupo->sum('monto'));
 
         $labels = [];
@@ -120,21 +119,42 @@ class ReporteController extends Controller
     }
 
     /**
-     * CU14 - Descargar copia de seguridad
+     * ✅ CU14 - Descargar copia de seguridad (versión corregida)
      */
     public function backup()
     {
         $usuarioId = Auth::id();
+
+        // 🔹 Trae los gastos del usuario
         $gastos = Gasto::where('idUsuario', $usuarioId)
             ->with('transferencia', 'categoria')
             ->get();
 
+        // 🔹 Convierte los datos a JSON
         $json = json_encode($gastos, JSON_PRETTY_PRINT);
         $filename = "backup_usuario_{$usuarioId}.json";
+        $path = storage_path('app/' . $filename);
 
-        Storage::disk('local')->put($filename, $json);
+        try {
+            // Crea la carpeta si no existe
+            if (!file_exists(storage_path('app'))) {
+                mkdir(storage_path('app'), 0777, true);
+            }
 
-        return response()->download(storage_path("app/$filename"));
+            // Guarda el archivo
+            file_put_contents($path, $json);
+
+            // Verifica si el archivo existe
+            if (!file_exists($path)) {
+                return back()->with('error', 'Error al crear el archivo de backup.');
+            }
+
+            // Descarga el archivo y luego lo borra
+            return response()->download($path)->deleteFileAfterSend(true);
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Ocurrió un error al generar el backup: ' . $e->getMessage());
+        }
     }
 }
 
