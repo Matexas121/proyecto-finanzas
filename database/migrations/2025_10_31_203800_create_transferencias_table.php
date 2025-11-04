@@ -1,7 +1,5 @@
 <?php
 
-
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,13 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('transferencias', function (Blueprint $table) {
-            $table->id('idTransferencia'); // Primary Key
-            $table->string('alias'); // Requisito: alias
-            $table->string('nombreDestinatario'); // Requisito: nombre de la persona
-            
-            // Relación con Gasto
-            $table->foreignId('gasto_id')->constrained('gastos', 'idGasto')->onDelete('cascade');
-
+            $table->id('idTransferencia'); // Clave primaria
+            $table->string('alias'); // Alias de la cuenta
+            $table->string('nombreDestinatario')->nullable(); // ✅ Ahora sí: campo nuevo, puede ser null
+            $table->foreignId('gasto_id') // Relación con Gasto
+                  ->constrained('gastos', 'idGasto')
+                  ->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -27,3 +24,4 @@ return new class extends Migration
         Schema::dropIfExists('transferencias');
     }
 };
+
