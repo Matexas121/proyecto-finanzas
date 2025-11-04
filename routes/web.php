@@ -32,6 +32,8 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+
+
 /*
 |--------------------------------------------------------------------------
 | RUTAS PROTEGIDAS - Accesibles solo con sesión iniciada
