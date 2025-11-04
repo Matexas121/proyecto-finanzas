@@ -33,15 +33,11 @@ class ReporteController extends Controller
         // Total de gastos del mes
         $totalGastos = $gastos->sum('monto');
 
-
-
         // Total de transferencias registradas (corrige la columna a gasto_id)
         $totalTransferencias = Transferencia::whereIn('gasto_id', $gastos->pluck('idGasto'))->count();
 
         // Saldo simulado (en este ejemplo fijo en 100000)
-
         $saldo = 100000 - $totalGastos;
-
 
         // Agrupar por categoría y calcular subtotales
         $porCategoria = $gastos->groupBy('idCategoria')->map(fn($grupo) => $grupo->sum('monto'));
@@ -50,8 +46,9 @@ class ReporteController extends Controller
         $labels = [];
         $data = [];
 
-        foreach ($porCategoria as $categoria => $monto) {
-            $labels[] = $categoria ? "Categoría $categoria" : "Sin categoría";
+        foreach ($porCategoria as $categoriaId => $monto) {
+            $categoria = $gastos->firstWhere('idCategoria', $categoriaId)?->categoria?->nombre;
+            $labels[] = $categoria ?? 'Sin categoría';
             $data[] = $monto;
         }
 
