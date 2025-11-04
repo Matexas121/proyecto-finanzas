@@ -26,7 +26,7 @@ class ReporteController extends Controller
 
         // Mes/Año principal (actual o seleccionado)
         $mesSeleccionado = request('mes') ?? now()->month;
-        $anioSeleccionado = request('anio') ?? now()->year;
+        $anioSeleccionado = request('anio') ?? now()->year; //agarra el mes y usuario, si no se elige nada se deja el actual
 
         // Mes/Año de comparación (opcional)
         $mesComparar = request('mes_comparar');
