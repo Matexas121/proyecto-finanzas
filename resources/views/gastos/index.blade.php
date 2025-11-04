@@ -147,13 +147,14 @@
         <h3>Total general: ${{ number_format($gastos->sum('monto'), 2, ',', '.') }}</h3>
 
         @if(isset($subtotales) && count($subtotales) > 0)
-            <h3>Subtotales por categoría:</h3>
-            <ul>
-                @foreach($subtotales as $idCategoria => $monto)
-                    <li><strong>Categoría #{{ $idCategoria }}:</strong> ${{ number_format($monto, 2, ',', '.') }}</li>
-                @endforeach
-            </ul>
-        @endif
+    <h3>Subtotales por categoría:</h3>
+    <ul>
+        {{-- Aquí, $nombreCategoria es la clave del array (el nombre) --}}
+        @foreach($subtotales as $nombreCategoria => $monto)
+            <li><strong>{{ $nombreCategoria }}:</strong> ${{ number_format($monto, 2, ',', '.') }}</li>
+        @endforeach
+    </ul>
+@endif
     @else
         <p>No hay gastos registrados aún.</p>
     @endif
