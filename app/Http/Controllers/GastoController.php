@@ -135,7 +135,7 @@ class GastoController extends Controller
             abort(403);
         }
 
-        $gasto->load('transferencia');
+        $gasto->load('transferencia', 'categoria');
         $categorias = Categoria::all();
 
         return view('gastos.edit', compact('gasto', 'categorias'));

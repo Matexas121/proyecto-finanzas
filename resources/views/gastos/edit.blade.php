@@ -55,12 +55,26 @@
             
             <br>
 
-            <label>Categoría (ID)</label>
-            <input name='idCategoria' type='number' 
-                   value='{{ old('idCategoria', $gasto->idCategoria) }}'>
-            @error('idCategoria') <span style="color: red;">{{ $message }}</span> @enderror
+            
+        <label>Categoría</label>
+        <select name="idCategoria">
+            {{-- Opción para "Sin Categoría" (si idCategoria es nullable) --}}
+                <option value="">-- Seleccione una categoría --</option> 
 
-            <br>
+                {{-- Iterar sobre la colección de categorías --}}
+                 @foreach ($categorias as $categoria)
+                  {{-- Clave para la persistencia de Old() y la selección actual --}}
+                 @php
+                 // Determinar si esta categoría debe estar 'selected'
+                 $isSelected = (string)old('idCategoria', $gasto->idCategoria) === (string)$categoria->idCategoria;
+                    @endphp
+                    <option value="{{ $categoria->idCategoria }}" {{ $isSelected ? 'selected' : '' }}>
+                {{ $categoria->nombre }}
+                </option>
+            @endforeach
+            </select>
+        @error('idCategoria') <span style="color: red;">{{ $message }}</span> @enderror
+
             
             {{-- CONTENEDOR DE CAMPOS DE TRANSFERENCIA --}}
             {{-- Nota: Usamos 'old' para persistir datos después de fallos de validación --}}

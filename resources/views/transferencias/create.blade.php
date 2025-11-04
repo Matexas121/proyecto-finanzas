@@ -1,3 +1,8 @@
+@extends("layout")
+
+@section("title", "Transferencias")
+
+@section("contenido")
 <html>
     <body>Alta de transferencia</body>
     <form method="post" action="{{route('transferencias.store')}}">
@@ -17,4 +22,6 @@
         <button type="submit">Guardar</button>
     </form>
 </html>
-
+@endsection
+    </div>
+</div>
