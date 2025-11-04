@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         @vite(
         [
+        'resources/css/app.css',
         'resources/saas/app.scss',
         'resources/js/app.js'
         ]) 
