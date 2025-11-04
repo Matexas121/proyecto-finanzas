@@ -8,6 +8,7 @@ use App\Models\Transferencia;
 use Illuminate\Support\Facades\Response;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class ReporteController extends Controller
 {
@@ -17,29 +18,42 @@ class ReporteController extends Controller
     }
 
     /**
-     * CU11 y CU12 - Resumen mensual y gráfico
+     * CU11 y CU12 - Resumen mensual, comparación y gráfico
      */
     public function index()
     {
         $usuarioId = Auth::id();
 
-        // Obtener los gastos del mes actual del usuario autenticado
+        // 🔹 Si el usuario eligió un mes/año, los usamos; sino tomamos el actual
+        $mesSeleccionado = request('mes') ?? now()->month;
+        $anioSeleccionado = request('anio') ?? now()->year;
+
+        // 🔹 Gastos del mes seleccionado
         $gastos = Gasto::where('idUsuario', $usuarioId)
-            ->whereMonth('fecha', now()->month)
-            ->whereYear('fecha', now()->year)
+            ->whereMonth('fecha', $mesSeleccionado)
+            ->whereYear('fecha', $anioSeleccionado)
             ->with('transferencia', 'categoria')
             ->get();
 
-        // Total de gastos del mes
         $totalGastos = $gastos->sum('monto');
-
-        // Total de transferencias registradas
         $totalTransferencias = Transferencia::whereIn('gasto_id', $gastos->pluck('idGasto'))->count();
 
-        // Agrupar por categoría y calcular subtotales
+        // 🔹 Gastos del mes anterior (para comparar)
+        $mesAnterior = Carbon::createFromDate($anioSeleccionado, $mesSeleccionado, 1)->subMonth();
+        $gastosMesAnterior = Gasto::where('idUsuario', $usuarioId)
+            ->whereMonth('fecha', $mesAnterior->month)
+            ->whereYear('fecha', $mesAnterior->year)
+            ->get();
+        $totalMesAnterior = $gastosMesAnterior->sum('monto');
+
+        // 🔹 Calcular variación porcentual
+        $variacion = $totalMesAnterior > 0
+            ? (($totalGastos - $totalMesAnterior) / $totalMesAnterior) * 100
+            : null;
+
+        // 🔹 Agrupar por categoría (para gráfico)
         $porCategoria = $gastos->groupBy('idCategoria')->map(fn($grupo) => $grupo->sum('monto'));
 
-        // Preparar datos para el gráfico
         $labels = [];
         $data = [];
 
@@ -49,13 +63,16 @@ class ReporteController extends Controller
             $data[] = $monto;
         }
 
-        // Renderizar la vista sin saldo
         return view('reportes.index', compact(
             'totalGastos',
             'totalTransferencias',
             'labels',
             'data',
-            'gastos'
+            'gastos',
+            'totalMesAnterior',
+            'variacion',
+            'mesSeleccionado',
+            'anioSeleccionado'
         ));
     }
 
@@ -65,13 +82,15 @@ class ReporteController extends Controller
     public function exportar($formato)
     {
         $usuarioId = Auth::id();
-        $gastos = Gasto::where('idUsuario', $usuarioId)->with('transferencia')->get();
+        $gastos = Gasto::where('idUsuario', $usuarioId)->with('transferencia', 'categoria')->get();
 
         if ($formato === 'csv') {
             // Generar CSV
-            $csv = "Fecha,Monto,Forma de Pago,Descripción,Alias,Destinatario\n";
+            $csv = "Fecha,Monto,Forma de Pago,Categoría,Descripción,Alias,Destinatario\n";
             foreach ($gastos as $g) {
-                $csv .= "{$g->fecha},{$g->monto},{$g->formaPago},{$g->descripcion},";
+                $categoria = $g->categoria->nombre ?? 'Sin categoría';
+                $csv .= "{$g->fecha},{$g->monto},{$g->formaPago},{$categoria},{$g->descripcion},";
+
                 $csv .= $g->transferencia
                     ? "{$g->transferencia->alias},{$g->transferencia->nombreDestinatario}\n"
                     : ",\n";
@@ -98,7 +117,7 @@ class ReporteController extends Controller
     {
         $usuarioId = Auth::id();
         $gastos = Gasto::where('idUsuario', $usuarioId)
-            ->with('transferencia')
+            ->with('transferencia', 'categoria')
             ->get();
 
         $json = json_encode($gastos, JSON_PRETTY_PRINT);
@@ -109,3 +128,4 @@ class ReporteController extends Controller
         return response()->download(storage_path("app/$filename"));
     }
 }
+
