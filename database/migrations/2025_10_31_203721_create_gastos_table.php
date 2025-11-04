@@ -16,7 +16,7 @@ return new class extends Migration
             $table->date('fecha'); // Requisito: Fecha
             $table->string('descripcion')->nullable(); // Requisito: Descripción opcional
             $table->enum('formaPago', ['debito', 'efectivo', 'credito', 'transferencia']); // Requisito: Forma de pago
-
+            $table->integer('dniUsuario')->nullable();
             // Relación con Usuario (D1)
             $table->foreignId('idUsuario')->constrained('users')->onDelete('cascade');
 

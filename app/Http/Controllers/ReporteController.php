@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Gasto;
 use App\Models\Transferencia;
 use Illuminate\Support\Facades\Response;
-use Barryvdh\DomPDF\Facade\Pdf; // Asegurate de tener instalada la librería DomPDF
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 
 class ReporteController extends Controller
@@ -23,18 +23,24 @@ class ReporteController extends Controller
     {
         $usuarioId = Auth::id();
 
+        // Obtener los gastos del mes actual del usuario autenticado
         $gastos = Gasto::where('idUsuario', $usuarioId)
             ->whereMonth('fecha', now()->month)
             ->whereYear('fecha', now()->year)
             ->with('transferencia')
             ->get();
 
+        // Total de gastos del mes
         $totalGastos = $gastos->sum('monto');
+
         $totalTransferencias = Transferencia::whereIn('gasto_id', $gastos->pluck('idGasto'))->count();
+
         $saldo = 100000 - $totalGastos;
 
+        // Agrupar por categoría y calcular subtotales
         $porCategoria = $gastos->groupBy('idCategoria')->map(fn($grupo) => $grupo->sum('monto'));
 
+        // Preparar datos para el gráfico
         $labels = [];
         $data = [];
 
@@ -43,7 +49,14 @@ class ReporteController extends Controller
             $data[] = $monto;
         }
 
-        return view('reportes.index', compact('totalGastos', 'totalTransferencias', 'saldo', 'labels', 'data', 'gastos'));
+        return view('reportes.index', compact(
+            'totalGastos',
+            'totalTransferencias',
+            'saldo',
+            'labels',
+            'data',
+            'gastos'
+        ));
     }
 
     /**
@@ -59,7 +72,9 @@ class ReporteController extends Controller
             $csv = "Fecha,Monto,Forma de Pago,Descripción,Alias,Destinatario\n";
             foreach ($gastos as $g) {
                 $csv .= "{$g->fecha},{$g->monto},{$g->formaPago},{$g->descripcion},";
-                $csv .= $g->transferencia ? "{$g->transferencia->alias},{$g->transferencia->nombreDestinatario}\n" : ",\n";
+                $csv .= $g->transferencia
+                    ? "{$g->transferencia->alias},{$g->transferencia->nombreDestinatario}\n"
+                    : ",\n";
             }
             $filename = "reporte_gastos.csv";
             return Response::make($csv, 200, [
@@ -82,7 +97,9 @@ class ReporteController extends Controller
     public function backup()
     {
         $usuarioId = Auth::id();
-        $gastos = Gasto::where('idUsuario', $usuarioId)->with('transferencia')->get();
+        $gastos = Gasto::where('idUsuario', $usuarioId)
+            ->with('transferencia')
+            ->get();
 
         $json = json_encode($gastos, JSON_PRETTY_PRINT);
         $filename = "backup_usuario_{$usuarioId}.json";
@@ -92,5 +109,3 @@ class ReporteController extends Controller
         return response()->download(storage_path("app/$filename"));
     }
 }
-
-
