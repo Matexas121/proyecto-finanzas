@@ -86,7 +86,7 @@
             @endif
         </table>
 
-        <a href="{{ route('gastos.index') }}">Volver al listado</a>
+        <a href="{{ route('gastos.index') }}">   Volver al listado</a>
     </div>
 </body>
 </html>
