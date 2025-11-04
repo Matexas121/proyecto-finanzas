@@ -59,14 +59,14 @@
 </head>
 
 <body>
-    <h1>📊 Comparador de Reportes Mensuales</h1>
-    <a href="{{ route('gastos.index') }}">⬅️ Volver a gastos</a>
+    <h1>Comparador de Reportes Mensuales</h1>
+    <a href="{{ route('gastos.index') }}">Volver a gastos</a>
     <hr>
 
     {{-- FORMULARIO DE SELECCIÓN DE MESES --}}
     <form method="GET" action="{{ route('reportes.index') }}">
         <fieldset>
-            <legend>📅 Mes principal</legend>
+            <legend>Mes principal</legend>
             <label for="mes">Mes:</label>
             <select name="mes" id="mes">
                 @for ($m = 1; $m <= 12; $m++)
@@ -87,7 +87,7 @@
         </fieldset>
 
         <fieldset>
-            <legend>📊 Mes para comparar (opcional)</legend>
+            <legend>Mes para comparar (opcional)</legend>
             <label for="mes_comparar">Mes:</label>
             <select name="mes_comparar" id="mes_comparar">
                 <option value="">-- Ninguno --</option>
@@ -109,12 +109,12 @@
             </select>
         </fieldset>
 
-        <button type="submit">📈 Ver comparación</button>
+        <button type="submit">Ver comparación</button>
     </form>
 
     {{-- Totales principales --}}
     <div class="card">
-        <h2>💰 Totales del mes seleccionado</h2>
+        <h2>Totales del mes seleccionado</h2>
         <p><strong>Total de gastos:</strong> ${{ number_format($totalGastos, 2, ',', '.') }}</p>
         <p><strong>Total de transferencias:</strong> {{ $totalTransferencias }}</p>
 
@@ -138,7 +138,7 @@
 
     {{-- Gráfico de distribución --}}
     <div class="card">
-        <h2>📊 Distribución de gastos por categoría</h2>
+        <h2>Distribución de gastos por categoría</h2>
         <div class="chart-container">
             <canvas id="graficoGastos"></canvas>
         </div>
@@ -146,7 +146,7 @@
 
     {{-- Tabla de detalle --}}
     <div class="card">
-        <h2>📋 Detalle de gastos del mes</h2>
+        <h2>Detalle de gastos del mes</h2>
         @if($gastos->count() > 0)
             <table>
                 <thead>
@@ -176,10 +176,10 @@
     </div>
 
     <hr>
-    <h2>📤 Exportar o Descargar</h2>
-    <a href="{{ url('/reportes/exportar/pdf') }}">📄 Exportar a PDF</a> |
-    <a href="{{ url('/reportes/exportar/csv') }}">📊 Exportar a CSV</a> |
-    <a href="{{ url('/reportes/backup') }}">💾 Descargar copia de seguridad</a>
+    <h2>Exportar o Descargar</h2>
+    <a href="{{ url('/reportes/exportar/pdf') }}">Exportar a PDF</a> |
+    <a href="{{ url('/reportes/exportar/csv') }}">Exportar a CSV</a> |
+    <a href="{{ url('/reportes/backup') }}">Descargar copia de seguridad</a>
 
     <script>
         const ctx = document.getElementById('graficoGastos');
