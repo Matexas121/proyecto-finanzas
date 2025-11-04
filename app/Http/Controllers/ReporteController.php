@@ -18,17 +18,21 @@ class ReporteController extends Controller
     }
 
     /**
-     * CU11 y CU12 - Resumen mensual, comparación y gráfico
+     * CU11 y CU12 - Resumen mensual con comparación entre meses seleccionados
      */
     public function index()
     {
         $usuarioId = Auth::id();
 
-        // 🔹 Si el usuario eligió un mes/año, los usamos; sino tomamos el actual
+        // 🔹 Mes/Año principal (actual o seleccionado)
         $mesSeleccionado = request('mes') ?? now()->month;
         $anioSeleccionado = request('anio') ?? now()->year;
 
-        // 🔹 Gastos del mes seleccionado
+        // 🔹 Mes/Año de comparación (opcional, elegidos por el usuario)
+        $mesComparar = request('mes_comparar');
+        $anioComparar = request('anio_comparar');
+
+        // 🔹 Gastos del mes principal
         $gastos = Gasto::where('idUsuario', $usuarioId)
             ->whereMonth('fecha', $mesSeleccionado)
             ->whereYear('fecha', $anioSeleccionado)
@@ -38,20 +42,25 @@ class ReporteController extends Controller
         $totalGastos = $gastos->sum('monto');
         $totalTransferencias = Transferencia::whereIn('gasto_id', $gastos->pluck('idGasto'))->count();
 
-        // 🔹 Gastos del mes anterior (para comparar)
-        $mesAnterior = Carbon::createFromDate($anioSeleccionado, $mesSeleccionado, 1)->subMonth();
-        $gastosMesAnterior = Gasto::where('idUsuario', $usuarioId)
-            ->whereMonth('fecha', $mesAnterior->month)
-            ->whereYear('fecha', $mesAnterior->year)
-            ->get();
-        $totalMesAnterior = $gastosMesAnterior->sum('monto');
+        // 🔹 Comparación con otro mes (si fue seleccionado)
+        $totalMesComparado = null;
+        $variacion = null;
 
-        // 🔹 Calcular variación porcentual
-        $variacion = $totalMesAnterior > 0
-            ? (($totalGastos - $totalMesAnterior) / $totalMesAnterior) * 100
-            : null;
+        if ($mesComparar && $anioComparar) {
+            $gastosComparar = Gasto::where('idUsuario', $usuarioId)
+                ->whereMonth('fecha', $mesComparar)
+                ->whereYear('fecha', $anioComparar)
+                ->get();
 
-        // 🔹 Agrupar por categoría (para gráfico)
+            $totalMesComparado = $gastosComparar->sum('monto');
+
+            // Si hay datos del mes comparado, calculamos la variación
+            if ($totalMesComparado > 0) {
+                $variacion = (($totalGastos - $totalMesComparado) / $totalMesComparado) * 100;
+            }
+        }
+
+        // 🔹 Gráfico de distribución por categoría
         $porCategoria = $gastos->groupBy('idCategoria')->map(fn($grupo) => $grupo->sum('monto'));
 
         $labels = [];
@@ -69,10 +78,12 @@ class ReporteController extends Controller
             'labels',
             'data',
             'gastos',
-            'totalMesAnterior',
-            'variacion',
             'mesSeleccionado',
-            'anioSeleccionado'
+            'anioSeleccionado',
+            'mesComparar',
+            'anioComparar',
+            'totalMesComparado',
+            'variacion'
         ));
     }
 
@@ -85,12 +96,10 @@ class ReporteController extends Controller
         $gastos = Gasto::where('idUsuario', $usuarioId)->with('transferencia', 'categoria')->get();
 
         if ($formato === 'csv') {
-            // Generar CSV
             $csv = "Fecha,Monto,Forma de Pago,Categoría,Descripción,Alias,Destinatario\n";
             foreach ($gastos as $g) {
                 $categoria = $g->categoria->nombre ?? 'Sin categoría';
                 $csv .= "{$g->fecha},{$g->monto},{$g->formaPago},{$categoria},{$g->descripcion},";
-
                 $csv .= $g->transferencia
                     ? "{$g->transferencia->alias},{$g->transferencia->nombreDestinatario}\n"
                     : ",\n";

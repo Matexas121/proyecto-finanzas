@@ -7,7 +7,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Resumen Mensual</title>
+    <title>Comparador de Reportes Mensuales</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -42,61 +42,97 @@
             padding: 8px;
             text-align: left;
         }
-        th {
-            background-color: #f2f2f2;
-        }
+        th { background-color: #f2f2f2; }
         .positive { color: green; font-weight: bold; }
         .negative { color: red; font-weight: bold; }
+        fieldset {
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        legend {
+            font-weight: bold;
+            color: #444;
+        }
     </style>
 </head>
 
 <body>
-    <h1>📅 Resumen Mensual</h1>
+    <h1>📊 Comparador de Reportes Mensuales</h1>
     <a href="{{ route('gastos.index') }}">⬅️ Volver a gastos</a>
     <hr>
 
-    {{-- FILTRO DE MES Y AÑO --}}
+    {{-- FORMULARIO DE SELECCIÓN DE MESES --}}
     <form method="GET" action="{{ route('reportes.index') }}">
-        <label for="mes">Mes:</label>
-        <select name="mes" id="mes">
-            @for ($m = 1; $m <= 12; $m++)
-                <option value="{{ $m }}" {{ $m == $mesSeleccionado ? 'selected' : '' }}>
-                    {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
-                </option>
-            @endfor
-        </select>
+        <fieldset>
+            <legend>📅 Mes principal</legend>
+            <label for="mes">Mes:</label>
+            <select name="mes" id="mes">
+                @for ($m = 1; $m <= 12; $m++)
+                    <option value="{{ $m }}" {{ $m == $mesSeleccionado ? 'selected' : '' }}>
+                        {{ \Carbon\Carbon::createFromDate(null, $m, 1)->translatedFormat('F') }}
+                    </option>
+                @endfor
+            </select>
 
-        <label for="anio">Año:</label>
-        <select name="anio" id="anio">
-            @for ($a = now()->year; $a >= now()->year - 3; $a--)
-                <option value="{{ $a }}" {{ $a == $anioSeleccionado ? 'selected' : '' }}>
-                    {{ $a }}
-                </option>
-            @endfor
-        </select>
+            <label for="anio">Año:</label>
+            <select name="anio" id="anio">
+                @for ($a = now()->year; $a >= now()->year - 3; $a--)
+                    <option value="{{ $a }}" {{ $a == $anioSeleccionado ? 'selected' : '' }}>
+                        {{ $a }}
+                    </option>
+                @endfor
+            </select>
+        </fieldset>
 
-        <button type="submit">📊 Ver resumen</button>
+        <fieldset>
+            <legend>📊 Mes para comparar (opcional)</legend>
+            <label for="mes_comparar">Mes:</label>
+            <select name="mes_comparar" id="mes_comparar">
+                <option value="">-- Ninguno --</option>
+                @for ($m = 1; $m <= 12; $m++)
+                    <option value="{{ $m }}" {{ $m == $mesComparar ? 'selected' : '' }}>
+                        {{ \Carbon\Carbon::createFromDate(null, $m, 1)->translatedFormat('F') }}
+                    </option>
+                @endfor
+            </select>
+
+            <label for="anio_comparar">Año:</label>
+            <select name="anio_comparar" id="anio_comparar">
+                <option value="">-- Ninguno --</option>
+                @for ($a = now()->year; $a >= now()->year - 3; $a--)
+                    <option value="{{ $a }}" {{ $a == $anioComparar ? 'selected' : '' }}>
+                        {{ $a }}
+                    </option>
+                @endfor
+            </select>
+        </fieldset>
+
+        <button type="submit">📈 Ver comparación</button>
     </form>
 
     {{-- Totales principales --}}
     <div class="card">
-        <h2>💵 Totales del mes</h2>
+        <h2>💰 Totales del mes seleccionado</h2>
         <p><strong>Total de gastos:</strong> ${{ number_format($totalGastos, 2, ',', '.') }}</p>
         <p><strong>Total de transferencias:</strong> {{ $totalTransferencias }}</p>
 
-        @if($totalMesAnterior > 0)
-            <p>
-                <strong>Comparado con el mes anterior:</strong>
-                @if($variacion > 0)
-                    <span class="negative">+{{ number_format($variacion, 2) }}%</span> más gasto
-                @elseif($variacion < 0)
-                    <span class="positive">{{ number_format($variacion, 2) }}%</span> menos gasto
-                @else
-                    Sin variación
-                @endif
-            </p>
-        @else
-            <p><em>No hay datos del mes anterior para comparar.</em></p>
+        @if($mesComparar && $anioComparar)
+            @if($totalMesComparado > 0)
+                <p>
+                    <strong>Comparado con {{ \Carbon\Carbon::createFromDate(null, $mesComparar, 1)->translatedFormat('F') }} {{ $anioComparar }}:</strong>
+                    @if($variacion > 0)
+                        <span class="negative">+{{ number_format($variacion, 2) }}%</span> más gasto
+                    @elseif($variacion < 0)
+                        <span class="positive">{{ number_format(abs($variacion), 2) }}%</span> menos gasto
+                    @else
+                        Sin variación
+                    @endif
+                </p>
+            @else
+                <p><em>No hay datos del mes comparado para mostrar.</em></p>
+            @endif
         @endif
     </div>
 
