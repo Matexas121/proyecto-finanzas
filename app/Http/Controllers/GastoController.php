@@ -16,7 +16,7 @@ class GastoController extends Controller
     }
 
     
-     * //CU8 - Visualización de lista de gastos del usuario autenticado.
+     //CU8 - Visualización de lista de gastos del usuario autenticado.
     public function index()
     {
         $usuarioId = Auth::id();
